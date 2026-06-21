@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 🚀 ഗൂഗിളിൽ സെർച്ച് ചെയ്താൽ വരാൻ വേണ്ടിയുള്ള SEO വാക്കുകൾ (Keywords) ⬇️ -->
+    <meta name="description" content="Ultimate 15-in-1 Puzzle Arena Game Hub - Play exciting puzzle and logic games.">
+    <meta name="keywords" content="puzzlearena, puzzle arena, puzzlearena-ten, vercel game, puzzle arena ten">
+    <meta name="author" content="Game Owner">
+    
+    <title>Ultimate 15-in-1 Arena</title>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --panel: #1e293b;
+            --accent: #6366f1;
+            --success: #10b981;
+            --btn-red: #ef4444;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg); color: #fff; margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; user-select: none;
+        }
+        h1 { font-size: 1.8rem; margin: 10px 0 15px 0; text-align: center; font-weight: 800; text-shadow: 0 0 10px rgba(99,102,241,0.5); }
+        
+        .hub-container {
+            background: var(--panel); padding: 25px; border-radius: 24px;
+            width: 100%; max-width: 540px; min-height: 520px; box-sizing: border-box; text-align: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: block;
+            position: relative; overflow: hidden; border: 1px solid #334155;
+        }
+
+        .inner-screen {
+            display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; height: 100%; width: 100%;
+        }
+
+        .name-input-field {
+            background: #0f172a; border: 2px solid #475569; border-radius: 14px;
+            padding: 14px; color: white; text-align: center; font-size: 1.1rem;
+            width: 85%; margin: 20px auto 10px auto; outline: none; font-weight: bold; transition: 0.2s; box-sizing: border-box;
+        }
+        .name-input-field:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(99,102,241,0.4); }
+
+        .main-mode-btn {
+            background: #2d3748; color: white; border: 3px solid transparent; padding: 22px 15px;
+            font-size: 1.2rem; font-weight: bold; border-radius: 16px; width: 100%; cursor: pointer; transition: 0.2s;
+        }
+        .comp-btn:hover { border-color: #38bdf8; background: #1e40af; transform: translateY(-2px); }
+        .p2-btn:hover { border-color: #f87171; background: #991b1b; transform: translateY(-2px); }
+        
+        .game-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; 
+            max-height: 380px; overflow-y: auto; padding-right: 5px; margin-top: 5px;
+        }
+        .game-grid::-webkit-scrollbar { width: 6px; }
+        .game-grid::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        .game-card { 
+            background: #0f172a; border: 1px solid #334155; padding: 14px 8px; 
+            border-radius: 14px; font-weight: bold; font-size: 0.85rem; cursor: pointer; 
+            color: #e2e8f0; transition: 0.2s; text-align: left; display: flex; align-items: center; gap: 5px;
+        }
+        .game-card:hover { border-color: var(--accent); background: #1e1b4b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99,102,241,0.2); }
+
+        .status-bar { background: #0f172a; padding: 12px; border-radius: 12px; width: 100%; font-size: 1rem; font-weight: bold; color: #38bdf8; box-sizing: border-box; border: 1px solid #334155; }
+        
+        .guide-box { background: rgba(99, 102, 241, 0.15); border-left: 4px solid var(--accent); padding: 10px; border-radius: 10px; text-align: left; color: #cbd5e1; width: 100%; box-sizing: border-box; font-size: 0.8rem; line-height: 1.4; }
+        
+        .action-btn { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; align-self: center; font-size: 0.95rem; transition: 0.2s; margin-top: auto;}
+        .action-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(99,102,241,0.4); }
+        .back-red { background: var(--btn-red); }
+        .back-red:hover { background: #dc2626; box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
+        
+        .game-canvas { 
+            width: 100%; min-height: 280px; border-radius: 16px; position: relative; 
+            border: 2px solid #475569; box-sizing: border-box; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 15px; transition: background 0.5s ease;
+        }
+        
+        .puzzle-sliding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 220px; height: 220px; }
+        .puzzle-tile { background: #ff7675; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; color: white; cursor: pointer; box-shadow: 0 4px 0 #d63031; transition: 0.1s; }
+        .puzzle-tile:active { transform: translateY(4px); box-shadow: none; }
+        .puzzle-tile.empty { background: transparent; cursor: default; border: none; box-shadow: none; }
+
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 250px; }
+        .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 220px; height: 220px; }
+        .math-btn { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.1s; }
+        .math-btn:active { transform: scale(0.95); }
+        
+        .victory-screen {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(15, 23, 42, 0.95); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10; animation: fadeIn 0.4s ease;
+        }
+        .victory-box {
+            background: linear-gradient(135deg, #10b981, #059669); padding: 30px;
+            border-radius: 20px; color: white; box-shadow: 0 10px 30px rgba(16,185,129,0.5);
+            text-align: center; transform: scale(0.7); animation: popUp 0.4s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp { to { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .confetti { position: absolute; width: 8px; height: 8px; background: #ff0; opacity: 0.8; border-radius: 50%; animation: fall 3s infinite linear; }
+        @keyframes fall {
+            0% { top: -10px; transform: translateX(0) rotate(0deg); }
+            100% { top: 100%; transform: translateX(100px) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧩 Ultimate Puzzle Arena</h1>
+
+    <div class="hub-container">
+        <!-- CELEBRATION WIN POPUP SCREEN -->
+        <div class="victory-screen" id="victoryLayer">
+            <div class="victory-box">
+                <h2 style="font-size: 2.5rem; margin: 0 0 10px 0;">🏆 VICTORY! 🏆</h2>
+                <p id="victoryMessage" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 20px;"></p>
+                <button class="action-btn" style="background: white; color: #059669; border: 2px solid white;" onclick="closeVictory()">Continue 😍</button>
+            </div>
+            <div id="confettiDrop"></div>
+        </div>
+
+        <!-- STARTING SCREEN: ENTER NAME FIRST -->
+        <div class="inner-screen" id="nameScreen" style="display: flex;">
+            <h2 style="margin: 10px 0 5px 0; font-size: 1.4rem; color: #fff;">Enter Your Name</h2>
+            <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">ഗെയിം ഹബ്ബിലേക്ക് കടക്കാൻ പേര് ടൈപ്പ് ചെയ്യുക:</p>
+            <input type="text" id="pNameInput" class="name-input-field" value="Player 1">
+            <button class="action-btn" onclick="submitName()" style="margin-top: 20px;">🚀 Enter Game Hub</button>
+        </div>
+
+        <!-- STEP 2: MODE SELECTION SCREEN -->
+        <div class="inner-screen" id="modeSelection" style="display: none;">
+            <h2 id="welcomeText" style="margin: 5px 0; font-size: 1.3rem; color: #38bdf8;">Welcome!</h2>
+            <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #94a3b8;">Choose Your Play Mode:</h3>
+            <button class="main-mode-btn comp-btn" onclick="showGallery('comp')">🤖 VS COMPUTER</button>
+            <div style="height: 5px;"></div>
+            <button class="main-mode-btn p2-btn" onclick="showGallery('p2')">👥 1 VS 1 BATTLE</button>
+            <button class="action-btn back-red" onclick="backToNameScreen()" style="margin-top: auto; padding: 10px 20px; font-size: 0.85rem;">⬅️ Change Name</button>
+        </div>
+
+        <!-- STEP 3: GAME GALLERY SCREEN (15 GAMES LIST) -->
+        <div class="inner-screen" id="gameGallery" style="display: none;">
+            <h2 id="galleryTitle" style="font-size: 1.2rem; margin: 5px 0; color: #818cf8;">Logic Game Station</h2>
+            <div class="game-grid" id="galleryGrid"></div>
+            <button class="action-btn back-red" onclick="showMainModeSelect()">⬅️ Main Menu</button>
+        </div>
+
+        <!-- STEP 4: INTERACTIVE PLAYGROUND CONTAINER -->
+        <div class="inner-screen" id="playground" style="display: none;">
+            <div class="guide-box">
+                <span style="font-weight: bold; color: #fff; display: block; margin-bottom: 2px;" id="engGuide">How to Play</span>
+                <span style="color: #cbd5e1; font-size: 0.75rem;" id="malGuide">എങ്ങനെ കളിക്കാം</span>
+            </div>
+            <div class="status-bar" id="gameStatus">Ready?</div>
+
+            <div class="game-canvas" id="canvasArea"></div>
+
+            <button class="action-btn back-red" onclick="exitToGallery()">Back to Menu</button>
+        </div>
+    </div>
+
+    <script>
+        let pName = "Player 1";
+        let currentMode = ''; 
+        let activeGameId = '';
+        let gameActive = true;
+        
+        let slidingBoard = []; 
+        let tttBoard = Array(9).fill('');
+        let memoryCards = [];
+        let firstCard = null, secondCard = null, lockMemory = false;
+        let simonSequence = [], playerSequence = [];
+        let rpsChoices = ['✊','✋','✌️'];
+
+        // WEB AUDIO API ENGINE
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                if(!audioCtx) return;
+                
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                } 
+                else if (type === 'win') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+                } 
+                else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch(e) { console.log("Audio contexts blocked"); }
+        }
+
+        const gamesList = [
+            { id: 'sliding_num', name: '🔢 Sliding Number', eng: "Slide adjacent tiles to arrange numbers 1 to 8 left-to-right.", mal: "ബ്ലാങ്ക് കട്ടയ്ക്ക് അടുത്തുള്ള കള്ളികൾ നീക്കി 1 മുതൽ 8 വരെ ക്രമത്തിൽ അടുക്കുക." },
+            { id: 'tictactoe', name: '❌ Tic-Tac-Toe', eng: "Align 3 identical symbols in a line to win the match.", mal: "ഒരേ വരിയിൽ 3 ചിഹ്നങ്ങൾ നേരെയാക്കി വെച്ച് കളി ജയിക്കുക." },
+            { id: 'math_wizard', name: '➕ Math Wizard', eng: "Solve the mental arithmetic challenge quickly under high speed.", mal: "കണക്കുകൾ വേഗത്തിൽ കൂട്ടി നോക്കി ശരിയായ ഉത്തരം തിരഞ്ഞെടുക്കുക." },
+            { id: 'pair_match', name: '🃏 Grid Pair Matcher', eng: "Flip blocks and match all hidden identical card emoji pairs.", mal: "മറഞ്ഞിരിക്കുന്ന ഒരേപോലെയുള്ള ചിഹ്നങ്ങളുടെ ജോഡികൾ കണ്ടെത്തുക." },
+            { id: 'color_odd', name: '🎨 Color Master', eng: "Quickly scan and identify the single unique shade box variant.", mal: "കൂട്ടത്തിൽ ചെറിയ നിറവ്യത്യാസമുള്ള ഒരു കള്ളി വേഗത്തിൽ കണ്ടെത്തുക." },
+            { id: 'simon_sound', name: '🧠 Sound Memory Simon', eng: "Watch and memorize the glowing color sequence pattern order correctly.", mal: "കത്തിവരുന്ന നിറങ്ങളുടെ പാറ്റേൺ ഓർത്തു വെച്ച് അതേപടി തിരിച്ചു ഞെക്കുക." },
+            { id: 'rps_arena', name: '✊ Rock Paper Scissors', eng: "Battle against computer inside the tactical legendary showdown arena.", mal: "കമ്പ്യൂട്ടറുമായി റോക്ക്-പേപ്പർ-സിസ്സർ കളിച്ച് ഭാഗ്യം പരീക്ഷിക്കുക." },
+            { id: 'fast_clicker', name: '⚡ Speed Click Rush', eng: "Tap the rapidly moving neon target button as fast as possible in 10s.", mal: "10 സെക്കൻഡിനുള്ളിൽ സ്ക്രീനിൽ ഓടിനടക്കുന്ന ബട്ടൺ പരമാവധി ക്ലിക്ക് ചെയ്യുക." },
+            { id: 'guess_num', name: '🔮 Magic Number Finder', eng: "Decode and guess the exact secret dynamic code logic hidden inside.", mal: "കമ്പ്യൂട്ടർ ഒളിപ്പിച്ച മാന്ത്രിക നമ്പർ സൂചനകൾ വഴി കണ്ടെത്തുക." },
+            { id: 'tap_green', name: '🟢 Reflex Green Catch', eng: "Test reflex accuracy, hit targets only when color transforms into Green.", mal: "നിറം പച്ചയാകുമ്പോൾ മാത്രം സ്ക്രീനിൽ വേഗത്തിൽ ഞെക്കി പോയിന്റ് നേടുക." },
+            { id: 'dice_roller', name: '🎲 Lucky Roller Duel', eng: "Roll magical lucky combination dies to beat highest score benchmark.", mal: "ഡൈസ് ഉരുട്ടി കമ്പ്യൂട്ടറിനേക്കാൾ കൂടുതൽ പോയിന്റ് നേടി വിജയിക്കുക." },
+            { id: 'word_scramble', name: '🔤 Word Unscrambler', eng: "Rearrange scrambled letters to discover correct tech dictionary terms.", mal: "അക്ഷരങ്ങൾ മാറ്റിമറിച്ച വാക്ക് ശരിയായ ക്രമത്തിൽ കണ്ടെത്തി എഴുതുക." },
+            { id: 'coin_flip', name: '🪙 Golden Coin Destiny', eng: "Predict and flip coin to win absolute fortune challenge streak.", mal: "കോയിൻ ടോസ് ചെയ്ത് ഹെഡ്ഡ് ആണോ ടെയിൽ ആണോ എന്ന് പ്രവചിക്കുക." },
+            { id: 'block_stack', name: '🧱 Brick Color Match', eng: "Tap correct sequential colored brick tiles blocks to stack structures.", mal: "പറയുന്ന നിറമുള്ള കട്ടകൾ മാത്രം തിരഞ്ഞെടുത്ത് തകർക്കാതെ അടുക്കുക." },
+            { id: 'rapid_timer', name: '⏱️ Target Second Stop', eng: "Stop timer precisely right at exact target second window mark.", mal: "കറക്റ്റ് സമയത്ത് ക്ലിക്ക് ചെയ്ത് ടൈമർ കൃത്യമായി സ്റ്റോപ്പ് ചെയ്യുക." }
+        ];
+
+        function submitName() {
+            playSound('click');
+            let inputVal = document.getElementById('pNameInput').value.trim();
+            if(inputVal !== "") { pName = inputVal; }
+
+            // 📩 --- ഓണർക്ക് ഇമെയിൽ മെസ്സേജ് അയക്കുന്ന ലളിതമായ വഴി ---
+            // താഴെയുള്ള 'YOUR_FORMSPREE_ID_HERE' മാറ്റി നിന്റെ ഫോം ഐഡി വെക്കുക.
+            const formspreeId = "mojoadzr"; 
+            
+            if (formspreeId !== "YOUR_FORMSPREE_ID_HERE") {
+                fetch(`https://formspree.io/f/${formspreeId}`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `🎮 പുതിയൊരാൾ കളി കാണാൻ വന്നിട്ടുണ്ട്!`,
+                        playerName: pName,
+                        time: new Date().toLocaleString()
+                    })
+                }).catch(e => console.log(e));
+            }
+            // ----------------------------------------------------
+
+            document.getElementById('welcomeText').innerText = `Hello, ${pName}! 👋`;
+            document.getElementById('nameScreen').style.display = 'none';
+            document.getElementById('modeSelection').style.display = 'flex';
+        }
+
+        function backToNameScreen() {
+            playSound('click');
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('nameScreen').style.display = 'flex';
+        }
+
+        function showMainModeSelect() {
+            playSound('click');
+            document.getElementById('modeSelection').style.display = 'flex';
+            document.getElementById('gameGallery').style.display = 'none';
+        }
+
+        function showGallery(mode) {
+            playSound('click');
+            currentMode = mode;
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('gameGallery').style.display = 'flex';
+            document.getElementById('galleryTitle').innerText = mode === 'comp' ? "🤖 VS COMPUTER GAMES" : "👥 1 VS 1 BATTLE STATIONS";
+            
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+            gamesList.forEach(g => {
+                let card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `<span>${g.name}</span>`;
+                card.onclick = () => launchPlayground(g.id);
+                grid.appendChild(card);
+            });
+        }
+
+        function launchPlayground(gameId) {
+            playSound('click');
+            document.getElementById('gameGallery').style.display = 'none';
+            document.getElementById('playground').style.display = 'flex';
+            let gObj = gamesList.find(x => x.id === gameId);
+            if(gObj) {
+                document.getElementById('engGuide').innerHTML = "💡 " + gObj.eng;
+                document.getElementById('malGuide').innerHTML = "💡 " + gObj.mal;
+            }
+            activeGameId = gameId;
+            gameActive = true;
+            renderLogicGame(gameId);
+        }
+
+        function exitToGallery() {
+            playSound('click');
+            document.getElementById('playground').style.display = 'none';
+            document.getElementById('gameGallery').style.display = 'flex';
+        }
+
+        function setStatus(t) { document.getElementById('gameStatus').innerText = t; }
+
+        function triggerWin(msg) {
+            gameActive = false;
+            playSound('win');
+            document.getElementById('victoryMessage').innerText = msg;
+            document.getElementById('victoryLayer').style.display = 'flex';
+            
+            let holder = document.getElementById('confettiDrop');
+            holder.innerHTML = '';
+            let colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+            for(let i=0; i<40; i++) {
+                let el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.animationDelay = Math.random() * 2 + 's';
+                el.style.width = (Math.random() * 6 + 6) + 'px';
+                el.style.height = el.style.width;
+                holder.appendChild(el);
+            }
+        }
+
+        function closeVictory() {
+            playSound('click');
+            document.getElementById('victoryLayer').style.display = 'none';
+            exitToGallery();
+        }
+
+        function renderLogicGame(id) {
+            const canvas = document.getElementById('canvasArea');
+            canvas.innerHTML = '';
+            
+            if(id === 'sliding_num') {
+                canvas.style.background = '#2d3436';
+                slidingBoard = [1, 2, 3, 4, 5, '', 7, 8, 6].sort(() => Math.random() - 0.5);
+                if(!slidingBoard.includes('')) slidingBoard.push('');
+                setStatus("Slide Tiles into Perfect 1-8 Sequence!");
+                renderSlidingGrid(canvas);
+            } 
+            else if(id === 'tictactoe') {
+                canvas.style.background = '#1e1b4b';
+                tttBoard = Array(9).fill('');
+                setStatus("Your turn! Place Symbol 'X'");
+                renderTicTacToe(canvas);
+            } 
+            else if(id === 'math_wizard') {
+                canvas.style.background = '#0e4429';
+                generateMathChallenge(canvas);
+            }
+            else if(id === 'pair_match') {
+                canvas.style.background = '#4c1d95';
+                setupMemoryGame(canvas);
+            }
+            else if(id === 'color_odd') {
+                canvas.style.background = '#581c87';
+                setupOddColorGame(canvas);
+            }
+            else if(id === 'simon_sound') { canvas.style.background = '#111827'; runSimonGame(canvas); }
+            else if(id === 'rps_arena') { canvas.style.background = '#311042'; runRpsGame(canvas); }
+            else if(id === 'fast_clicker') { canvas.style.background = '#701a75'; runFastClicker(canvas); }
+            else if(id === 'guess_num') { canvas.style.background = '#831a3b'; runGuessNum(canvas); }
+            else if(id === 'tap_green') { canvas.style.background = '#064e3b'; runTapGreen(canvas); }
+            else if(id === 'dice_roller') { canvas.style.background = '#7c2d12'; runDiceRoller(canvas); }
+            else if(id === 'word_scramble') { canvas.style.background = '#1e3a8a'; runWordScramble(canvas); }
+            else if(id === 'coin_flip') { canvas.style.background = '#1c1917'; runCoinFlip(canvas); }
+            else if(id === 'block_stack') { canvas.style.background = '#451a03'; runBlockStack(canvas); }
+            else if(id === 'rapid_timer') { canvas.style.background = '#03484d'; runRapidTimer(canvas); }
+        }
+
+        // 1. SLIDING NUMBER PUZZLE
+        function renderSlidingGrid(canvas) {
+            canvas.innerHTML = '';
+            let gridContainer = document.createElement('div');
+            gridContainer.className = 'puzzle-sliding-grid';
+            slidingBoard.forEach((num, idx) => {
+                let tile = document.createElement('div');
+                tile.className = num === '' ? 'puzzle-tile empty' : 'puzzle-tile';
+                tile.innerText = num;
+                tile.style.background = '#fdcb6e';
+                tile.style.boxShadow = '0 4px 0 #e17055';
+                tile.onclick = () => moveSlidingTile(idx);
+                gridContainer.appendChild(tile);
+            });
+            canvas.appendChild(gridContainer);
+        }
+        function moveSlidingTile(idx) {
+            if(!gameActive) return;
+            playSound('click');
+            let emptyIdx = slidingBoard.indexOf('');
+            let rowIdx = Math.floor(idx / 3), colIdx = idx % 3;
+            let empRow = Math.floor(emptyIdx / 3), empCol = emptyIdx % 3;
+            if (Math.abs(rowIdx - empRow) + Math.abs(colIdx - empCol) === 1) {
+                slidingBoard[emptyIdx] = slidingBoard[idx];
+                slidingBoard[idx] = '';
+                renderSlidingGrid(document.getElementById('canvasArea'));
+                if(JSON.stringify(slidingBoard) === JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8, ''])) {
+                    triggerWin(`Brilliant ${pName}! Sliding puzzle solved successfully!`);
+                }
+            }
+        }
+
+        // 2. TIC-TAC-TOE
+        function renderTicTacToe(canvas) {
+            canvas.innerHTML = '';
+            let grid = document.createElement('div');
+            grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(3, 1fr)'; grid.style.gap = '10px';
+            tttBoard.forEach((val, idx) => {
+                let cell = document.createElement('div');
+                cell.className = 'puzzle-tile';
+                cell.style.width = '65px'; cell.style.height = '65px';
+                cell.innerText = val;
+                cell.style.background = val==='X' ? '#06b6d4' : (val==='O' ? '#f43f5e' : '#475569');
+                cell.style.boxShadow = 'none';
+                cell.onclick = () => handleTTTClick(idx);
+                grid.appendChild(cell);
+            });
+            canvas.appendChild(grid);
+        }
+        function handleTTTClick(idx) {
+            if(!gameActive || tttBoard[idx] !== '') return;
+            playSound('click');
+            tttBoard[idx] = 'X';
+            renderTicTacToe(document.getElementById('canvasArea'));
+            if(checkTTTWin('X')) { triggerWin(`Congratulations ${pName}! You won Tic-Tac-Toe!`); return; }
+            if(!tttBoard.includes('')) { setStatus("Draw Match!"); return; }
+
+            if(currentMode === 'comp') {
+                let free = tttBoard.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+                let pick = free[Math.floor(Math.random() * free.length)];
+                tttBoard[pick] = 'O';
+                setTimeout(() => {
+                    renderTicTacToe(document.getElementById('canvasArea'));
+                    if(checkTTTWin('O')) { playSound('wrong'); setStatus("🤖 Computer Won!"); }
+                }, 400);
+            }
+        }
+        function checkTTTWin(p) { return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(w => w.every(i => tttBoard[i] === p)); }
+
+        // 3. MATH WIZARD
+        function generateMathChallenge(canvas) {
+            let n1 = Math.floor(Math.random() * 15) + 5; let n2 = Math.floor(Math.random() * 15) + 5;
+            let ans = n1 + n2;
+            canvas.innerHTML = `<div style='font-size:2.5rem; font-weight:bold; color:#55efc4; margin-bottom:20px;'>${n1} + ${n2} = ?</div>`;
+            let box = document.createElement('div'); box.style.display='grid'; box.style.gridTemplateColumns='1fr 1fr'; box.style.gap='10px';
+            let choices = [ans, ans+3, ans-2, ans+5].sort(() => Math.random() - 0.5);
+            choices.forEach(ch => {
+                let b = document.createElement('button'); b.className = 'math-btn'; b.innerText = ch;
+                b.onclick = () => {
+                    if(ch === ans) { triggerWin("Wow! Math Calculation is 100% Correct!"); } 
+                    else { playSound('wrong'); setStatus("❌ Wrong! Try again."); }
+                };
+                box.appendChild(b);
+            });
+            canvas.appendChild(box);
+        }
+
+        // 4. PAIR MATCH
+        function setupMemoryGame(canvas) {
+            let items = ['🦊','🦊','🐸','🐸','🤖','🤖','🍕','🍕','💎','💎','🎈','🎈'].sort(() => Math.random() - 0.5);
+            let grid = document.createElement('div'); grid.className = 'memory-grid';
+            items.forEach((emo) => {
+                let card = document.createElement('div'); card.className = 'puzzle-tile';
+                card.style.height = '55px'; card.innerText = '❓'; card.style.background = '#a855f7';
+                card.onclick = () => {
+                    if(lockMemory || card.innerText !== '❓') return;
+                    playSound('click');
+                    card.innerText = emo; card.style.background = '#ec4899';
+                    if(!firstCard) { firstCard = card; } else {
+                        secondCard = card; lockMemory = true;
+                        if(firstCard.innerText === secondCard.innerText) {
+                            firstCard = null; secondCard = null; lockMemory = false;
+                            if(!Array.from(grid.children).some(c => c.innerText==='❓')) triggerWin("Epic Memory Power Displayed!");
+                        } else {
+                            setTimeout(() => { playSound('wrong'); firstCard.innerText='❓'; firstCard.style.background='#a855f7'; secondCard.innerText='❓'; secondCard.style.background='#a855f7'; firstCard=null; secondCard=null; lockMemory=false; }, 600);
+                        }
+                    }
+                };
+                grid.appendChild(card);
+            });
+            canvas.appendChild(grid);
+        }
+
+        // 5. COLOR MASTER
+        function setupOddColorGame(canvas) {
+            let grid = document.createElement('div'); grid.className = 'color-grid';
+            let r = Math.floor(Math.random()*150), g = Math.floor(Math.random()*150), b = Math.floor(Math.random()*150);
+            let oddIdx = Math.floor(Math.random()*9);
+            for(let i=0; i<9; i++) {
+                let block = document.createElement('div'); block.style.borderRadius='12px'; block.style.width='100%'; block.style.height='65px';
+                block.style.background = (i===oddIdx) ? `rgb(${r+25},${g+25},${b+25})` : `rgb(${r},${g},${b})`;
+                block.onclick = () => { 
+                    if(i===oddIdx) { triggerWin("Visionary Sharp Eyes! Spot On!"); }
+                    else { playSound('wrong'); setStatus("❌ Missed! Look closely."); }
+                };
+                grid.appendChild(block);
+            }
+            canvas.appendChild(grid);
+        }
+
+        // 6. SIMON MEMORY GAME
+        function runSimonGame(canvas) {
+            setStatus("Watch closely the flash sequence!");
+            canvas.innerHTML = "<div id='simonBox' style='display:grid; grid-template-columns:1fr 1fr; gap:15px; width:200px;'></div>";
+            let colors = ['#ef4444','#3b82f6','#eab308','#22c55e'];
+            colors.forEach((c, i) => {
+                let d = document.createElement('div'); d.style.width='90px'; d.style.height='90px'; d.style.background=c; d.style.borderRadius='15px'; d.style.opacity='0.4'; d.style.cursor='pointer';
+                d.onclick = () => {
+                    if(!gameActive) return;
+                    playSound('click');
+                    d.style.opacity='1'; setTimeout(() => d.style.opacity='0.4', 200);
+                    playerSequence.push(i);
+                    if(playerSequence[playerSequence.length-1] !== simonSequence[playerSequence.length-1]) { playSound('wrong'); setStatus("Game Over! Wrong Sequence."); return; }
+                    if(playerSequence.length === simonSequence.length) { triggerWin("Flawless Sequence Memory Match!"); }
+                };
+                canvas.querySelector('#simonBox').appendChild(d);
+            });
+            simonSequence = [Math.floor(Math.random()*4), Math.floor(Math.random()*4), Math.floor(Math.random()*4)];
+            playerSequence = [];
+            let flashIdx = 0;
+            let iv = setInterval(() => {
+                let container = canvas.querySelector('#simonBox');
+                if(!container) { clearInterval(iv); return; }
+                let targetNode = container.children[simonSequence[flashIdx]];
+                if(targetNode) { playSound('click'); targetNode.style.opacity='1'; setTimeout(() => targetNode.style.opacity='0.4', 300); }
+                flashIdx++; if(flashIdx >= simonSequence.length) clearInterval(iv);
+            }, 600);
+        }
+
+        // 7. ROCK PAPER SCISSORS
+        function runRpsGame(canvas) {
+            setStatus("Choose Your Move!");
+            canvas.innerHTML = "<div style='display:flex; gap:15px;'></div>";
+            rpsChoices.forEach(ch => {
+                let btn = document.createElement('button'); btn.style.fontSize='2.5rem'; btn.style.padding='15px'; btn.style.background='#d946ef'; btn.style.border='none'; btn.style.borderRadius='15px'; btn.style.cursor='pointer';
+                btn.innerText = ch;
+                btn.onclick = () => {
+                    let bot = rpsChoices[Math.floor(Math.random()*3)];
+                    if(ch === bot) { playSound('click'); setStatus(`Draw! Both selected ${ch}`); }
+                    else if((ch==='✊'&&bot==='✌️') || (ch==='✋'&&bot==='✊') || (ch==='✌️'&&bot==='✋')) { triggerWin(`You won! ${ch} beats ${bot}`); }
+                    else { playSound('wrong'); setStatus(`Lost! Computer chose ${bot}`); }
+                };
+                canvas.firstChild.appendChild(btn);
+            });
+        }
+
+        // 8. SPEED CLICKER
+        function runFastClicker(canvas) {
+            let clicks = 0; setStatus("Tap button quickly before 10 seconds end!");
+            canvas.innerHTML = "<button id='clickTarget' style='padding:20px 40px; background:#e11d48; color:white; font-size:1.5rem; border:none; border-radius:50%; cursor:pointer; font-weight:bold; box-shadow:0 0 20px #e11d48;'>TAP ME: 0</button>";
+            let btn = canvas.firstChild;
+            btn.onclick = () => {
+                playSound('click');
+                clicks++; btn.innerText = `TAP ME: ${clicks}`;
+                btn.style.transform = `scale(${1 + clicks*0.01})`;
+                if(clicks >= 15) { triggerWin(`Super Fast Speed Master! Total Click Score: ${clicks}`); }
+            };
+        }
+
+        // 9. GUESS THE NUMBER
+        function runGuessNum(canvas) {
+            let secret = Math.floor(Math.random()*10) + 1; setStatus("Guess target single code number between 1 and 10!");
+            canvas.innerHTML = "<div style='display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;'></div>";
+            for(let i=1; i<=10; i++) {
+                let b = document.createElement('button'); b.className='math-btn'; b.innerText=i;
+                b.onclick = () => {
+                    if(i === secret) triggerWin(`Fortune Telepathy Unlock! Code was indeed ${secret}!`);
+                    else { playSound('wrong'); b.style.background='#451a03'; setStatus("❌ No! Try another number."); }
+                };
+                canvas.firstChild.appendChild(b);
+            }
+        }
+
+        // 10. REFLEX GREEN CATCH
+        function runTapGreen(canvas) {
+            setStatus("Wait for color to transform Green... then click!");
+            canvas.innerHTML = "<div id='reflexBlock' style='width:130px; height:130px; background:#f43f5e; border-radius:20px; cursor:pointer;'></div>";
+            let box = canvas.firstChild; let isGreen = false;
+            setTimeout(() => { if(document.getElementById('reflexBlock')) { box.style.background = '#10b981'; isGreen = true; playSound('click'); } }, Math.random()*2000 + 1500);
+            box.onclick = () => {
+                if(isGreen) triggerWin("Super Sonic Quick Reflex Catch Achieved!");
+                else { playSound('wrong'); setStatus("❌ Clicked too early! Game Over."); box.style.background='#334155'; }
+            };
+        }
+
+        // 11. DICE ROLLER
+        function runDiceRoller(canvas) {
+            setStatus("Roll dice to beat enemy threshold!");
+            canvas.innerHTML = "<button id='rollBtn' style='padding:15px 30px; font-size:1.2rem; background:#ea580c; border:none; border-radius:12px; color:white; font-weight:bold; cursor:pointer;'>🎲 Roll Magical Dice</button>";
+            canvas.firstChild.onclick = () => {
+                let pScore = Math.floor(Math.random()*6)+1; let bScore = Math.floor(Math.random()*5)+1;
+                if(pScore > bScore) triggerWin(`Lucky High Roll Win! You got ${pScore} vs Bot's ${bScore}!`);
+                else { playSound('wrong'); setStatus(`🎲 Rolled ${pScore} vs Computer ${bScore}. Roll again!`); }
+            };
+        }
+
+        // 12. WORD SCRAMBLE
+        function runWordScramble(canvas) {
+            let words = [{s:'OMPCTUER', r:'COMPUTER'}, {s:'AMRTE', r:'SMART'}, {s:'ZPLZUE', r:'PUZZLE'}];
+            let pick = words[Math.floor(Math.random()*words.length)];
+            setStatus("Arrange letters to build correct word terms!");
+            canvas.innerHTML = `<div style='font-size:2rem; letter-spacing:4px; font-weight:bold; color:#60a5fa; margin-bottom:15px;'>${pick.s}</div>`;
+            let box = document.createElement('div'); box.style.display='flex'; box.style.gap='10px';
+            let choices = [pick.r, 'MOBILE', 'LOGIC', 'SYSTEM'].sort(() => Math.random()-0.5);
+            choices.forEach(ch => {
+                let b = document.createElement('button'); b.className='math-btn'; b.innerText=ch;
+                b.onclick = () => { 
+                    if(ch===pick.r) triggerWin("Word Unscrambler Victory! Language Master!"); 
+                    else { playSound('wrong'); setStatus("❌ Incorrect word block!"); }
+                };
+                box.appendChild(b);
+            });
+            canvas.appendChild(box);
+        }
+
+        // 13. COIN FLIP DESTINY
+        function runCoinFlip(canvas) {
+            setStatus("Predict Coin Destiny!");
+            canvas.innerHTML = "<div style='display:flex; gap:20px;'><button class='math-btn' style='background:#ca8a04'>HEADS 🪙</button><button class='math-btn' style='background:#78716c'>TAILS 🪙</button></div>";
+            let btns = canvas.firstChild.children;
+            let handler = (guess) => {
+                let res = Math.random() > 0.5 ? 'HEADS' : 'TAILS';
+                if(guess === res) triggerWin(`Absolute Fortune Lock! Coin landed on ${res}!`);
+                else { playSound('wrong'); setStatus(`❌ Landed on ${res}. Try flipping again!`); }
+            };
+            btns[0].onclick = () => handler('HEADS'); btns[1].onclick = () => handler('TAILS');
+        }
+
+        // 14. BLOCK COLOR STACK
+        function runBlockStack(canvas) {
+            setStatus("Tap the 'ORANGE' block tile specifically!");
+            canvas.innerHTML = "<div style='display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; width:160px;'></div>";
+            let cList = ['#ea580c','#4f46e5','#16a34a','#db2777'];
+            cList.forEach((col) => {
+                let block = document.createElement('div'); block.style.width='70px'; block.style.height='70px'; block.style.background=col; block.style.borderRadius='10px'; block.style.cursor='pointer';
+                block.onclick = () => { 
+                    if(col==='#ea580c') triggerWin("Target Color Stacking Lock Succeeded!"); 
+                    else { playSound('wrong'); setStatus("❌ Wrong block! Tap the Orange one."); }
+                };
+                canvas.firstChild.appendChild(block);
+            });
+        }
+
+        // 15. TARGET SECOND STOP
+        function runRapidTimer(canvas) {
+            setStatus("Stop counter precisely when display clock matches 3!");
+            canvas.innerHTML = "<div id='clockDisp' style='font-size:3rem; font-weight:bold; color:#06b6d4; margin-bottom:15px;'>0.0</div><button class='action-btn' style='background:#0891b2;'>STOP CHRONO</button>";
+            let clock = canvas.querySelector('#clockDisp'); let runBtn = canvas.querySelector('button');
+            let count = 0;
+            let tm = setInterval(() => { if(document.getElementById('clockDisp')) { count += 0.1; clock.innerText = count.toFixed(1); if(count >= 5) count=0; } else { clearInterval(tm); } }, 100);
+            runBtn.onclick = () => {
+                clearInterval(tm);
+                if(clock.innerText === "3.0") triggerWin("Flawless Chronometer Speed Precise Timing Hit!");
+                else { playSound('wrong'); setStatus(`❌ Clock stopped at ${clock.innerText}. Missed 3.0 target!`); }
+            };
+        }
+    </script>
+</body>
+</html>
